@@ -1,0 +1,23 @@
+{
+  "qNum": 2,
+  "shots": 1000,
+  "qStates":[0,0,0],
+  "gates": [
+    {"operation": "x", "qbits": [
+      {"target": 0}]
+    },
+    {"operation": "x", "qbits": [
+      {"target": 1}]
+    },
+    {"operation": "h", "qbits": [
+      {"target": 0}]
+    },
+    {"operation": "x", "qbits": [
+      {"target": 1, "control": [0]}]
+    },
+    {"operation": "Measure", "qbits": [
+      {"control": [0, 1]}]
+    }]
+}
+
+
