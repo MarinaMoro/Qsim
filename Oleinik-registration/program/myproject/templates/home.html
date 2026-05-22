@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            
+            {% if user.is_authenticated %}
+                <!-- КОНТЕНТ ДЛЯ АВТОРИЗОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ -->
+                <div class="alert alert-success mb-4">
+                    <h4 class="mb-3">Добро пожаловать, {{ user.get_full_name_display }}!</h4>
+                    <p class="mb-0">Вы успешно вошли в систему QTlab.</p>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-plus-circle"></i> Создать проект
+                                </h5>
+                                <p class="card-text text-muted">
+                                    Создайте новый проект, настройте параметры и начните исследования.
+                                </p>
+                                <a href="{% url 'projects:create' %}" class="btn btn-success">
+                                    + Создать проект
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Блок 2: Мои проекты (исправлена ссылка) -->
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-folder"></i> Мои проекты
+                                </h5>
+                                <p class="card-text text-muted">
+                                    Просмотр, редактирование и управление существующими проектами.
+                                </p>
+                                <a href="{% url 'projects:list' %}" class="btn btn-primary">
+                                    Перейти к проектам
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Подсказка о боковом меню -->
+                <div class="mt-4 text-muted">
+                    <small>
+                        <i class="bi bi-arrow-right-circle"></i> 
+                        Для доступа к профилю и настройкам используйте боковое меню (три полоски справа)
+                    </small>
+                </div>
+                
+            {% else %}
+                <!-- КОНТЕНТ ДЛЯ ГОСТЕЙ (НЕ В СИСТЕМЕ) -->
+                <h1 class="display-4 mb-4">Добро пожаловать в QTlab</h1>
+                
+                <p class="lead mb-4">Веб-лаборатория для работы с квантовыми вычислениями</p>
+                
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <p class="fs-5">
+                            Для начала работы необходимо войти в систему или зарегистрироваться.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-block">
+                    <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg me-md-3 mb-2 mb-md-0">
+                        Регистрация
+                    </a>
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg">
+                        Вход
+                    </a>
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

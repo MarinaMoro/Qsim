@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h2 class="mb-4">Профиль пользователя</h2>
+        
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title text-center mb-4">
+                    {{ user.get_full_name_display|default:user.username }}
+                </h4>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Фамилия:</strong> {{ user.last_name|default:"Не указана" }}</p>
+                        <p><strong>Имя:</strong> {{ user.first_name|default:"Не указано" }}</p>
+                        {% if user.middle_name %}
+                        <p><strong>Отчество:</strong> {{ user.middle_name }}</p>
+                        {% endif %}
+                        <p><strong>Логин:</strong> {{ user.username }}</p>
+                        <p><strong>Email:</strong> {{ user.email|default:"Не указан" }}</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {% if user.phone %}
+                        <p><strong>Телефон:</strong> {{ user.phone }}</p>
+                        {% endif %}
+                        
+                        {% if user.organization %}
+                        <p><strong>Место работы/учёбы:</strong> {{ user.organization }}</p>
+                        {% endif %}
+                        
+                        {% if user.position %}
+                        <p><strong>Должность:</strong> {{ user.position }}</p>
+                        {% endif %}
+                        
+                        <p><strong>Роль:</strong> 
+                            <span class="badge bg-secondary">
+                                {{ user.get_role_display }}
+                            </span>
+                        </p>
+                        <p><strong>Дата регистрации:</strong> {{ user.created_at|date:"d.m.Y H:i" }}</p>
+                        <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i"|default:"Ещё не входил" }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center mt-3">
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-house"></i> На главную
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quantum Technologies Lab{% endblock %}</title>
+    <meta name="description" content="QTlab — платформа для квантовых технологий и исследований">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .offcanvas {
+            width: 320px !important;
+        }
+        .offcanvas-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: none;
+        }
+        .offcanvas-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+        .user-info-sidebar {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .user-info-sidebar h6 {
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+        .user-info-sidebar small {
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        .user-avatar-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            border: 3px solid white;
+        }
+        .nav-link-sidebar {
+            color: #495057;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid transparent;
+        }
+        .nav-link-sidebar:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+            border-left-color: #0d6efd;
+        }
+        .nav-link-sidebar i {
+            margin-right: 12px;
+            width: 20px;
+            font-size: 1.2rem;
+        }
+        .nav-link-sidebar.text-danger:hover {
+            background-color: #fff5f5;
+            border-left-color: #dc3545;
+        }
+        .dropdown-divider-sidebar {
+            margin: 0.5rem 1.5rem;
+            border-top: 1px solid #dee2e6;
+        }
+        .menu-button {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .menu-button:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">QTlab</a>
+            
+            <div class="d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <!-- Бургер-меню для авторизованных -->
+                    <button class="menu-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#profileMenu">
+                        <i class="bi bi-list fs-4"></i>
+                        <span class="d-none d-sm-inline ms-1">Меню</span>
+                    </button>
+                {% else %}
+                    <!-- Обычные кнопки для гостей -->
+                    <div class="navbar-nav">
+                        <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                        <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Оффканвас меню (боковая панель) для авторизованных -->
+    {% if user.is_authenticated %}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="profileMenu" aria-labelledby="profileMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="profileMenuLabel">Меню профиля</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <!-- Информация о пользователе -->
+            <div class="user-info-sidebar text-center">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" class="user-avatar" alt="Avatar">
+                {% else %}
+                    <div class="user-avatar-placeholder mx-auto">
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                    </div>
+                {% endif %}
+                <h6>{{ user.get_full_name_display }}</h6>
+                <small>{{ user.email }}</small>
+                <div class="mt-2">
+                    <span class="badge bg-light text-dark">{{ user.get_role_display }}</span>
+                </div>
+            </div>
+            
+            <!-- Навигационные блоки с правильными ссылками -->
+            <div class="nav flex-column mt-2">
+                <!-- 1. Персональные данные (профиль) -->
+                <a class="nav-link-sidebar" href="{% url 'users:profile' %}">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Персональные данные</span>
+                </a>
+                
+                <!-- 2. Проекты -->
+                <a class="nav-link-sidebar" href="{% url 'projects:list' %}">
+                    <i class="bi bi-folder"></i>
+                    <span>Проекты</span>
+                </a>
+                
+                <!-- 3. Настройки аккаунта (НОВАЯ ССЫЛКА) -->
+                <a class="nav-link-sidebar" href="{% url 'users:account_settings' %}">
+                    <i class="bi bi-gear"></i>
+                    <span>Настройки аккаунта</span>
+                </a>
+                
+                <div class="dropdown-divider-sidebar"></div>
+                
+                <!-- Выход -->
+                <a class="nav-link-sidebar text-danger" href="{% url 'users:logout' %}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Выйти из аккаунта</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

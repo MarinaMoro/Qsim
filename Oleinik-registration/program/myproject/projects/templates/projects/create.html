@@ -1,0 +1,127 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">Создать новый проект</h2>
+            
+            <form method="post" enctype="multipart/form-data" id="projectForm">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label">Название проекта <span class="text-danger">*</span></label>
+                    <input type="text" name="name" class="form-control" required 
+                           placeholder="Введите название проекта">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea name="description" class="form-control" rows="3" 
+                              placeholder="Краткое описание проекта"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">JSON конфигурация (необязательно)</label>
+                    <textarea name="json_data" class="form-control" rows="5" 
+                              placeholder='{
+    "algorithm": "Shor",
+    "qubits": 5,
+    "iterations": 1000
+}'></textarea>
+                    <small class="text-muted">Введите JSON данные для конфигурации проекта</small>
+                </div>
+                
+                <!-- Блок загрузки файлов -->
+                <div class="mb-4">
+                    <label class="form-label">Загрузить файлы (PNG, PDF, JSON)</label>
+                    <div class="border rounded p-3 bg-light">
+                        <div class="mb-2">
+                            <input type="file" name="files" class="form-control" id="fileInput" 
+                                   multiple accept=".png,.pdf,.json,image/png,application/pdf,application/json">
+                            <small class="text-muted">Можно выбрать несколько файлов</small>
+                        </div>
+                        
+                        <!-- Список выбранных файлов -->
+                        <div id="fileList" class="mt-2">
+                            <p class="text-muted small mb-0">Файлы не выбраны</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary px-4">Создать проект</button>
+                    <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary px-4">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    
+    // Отображение выбранных файлов
+    fileInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        
+        if (files.length === 0) {
+            fileList.innerHTML = '<p class="text-muted small mb-0">Файлы не выбраны</p>';
+            return;
+        }
+        
+        let html = '<div class="list-group">';
+        files.forEach((file, index) => {
+            // Определяем иконку по типу файла
+            let icon = 'bi-file-earmark';
+            let iconClass = 'text-secondary';
+            
+            if (file.type.includes('image/png')) {
+                icon = 'bi-file-earmark-image';
+                iconClass = 'text-success';
+            } else if (file.type.includes('pdf')) {
+                icon = 'bi-file-earmark-pdf';
+                iconClass = 'text-danger';
+            } else if (file.type.includes('json')) {
+                icon = 'bi-file-earmark-code';
+                iconClass = 'text-info';
+            }
+            
+            html += `
+                <div class="list-group-item d-flex align-items-center">
+                    <i class="bi ${icon} ${iconClass} me-3 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>${file.name}</strong>
+                        <br>
+                        <small class="text-muted">${(file.size / 1024).toFixed(2)} KB</small>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        fileList.innerHTML = html;
+    });
+    
+    // Защита от двойной отправки
+    document.getElementById('projectForm').addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Создание...';
+    });
+});
+</script>
+
+<style>
+.list-group-item {
+    transition: background-color 0.2s;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+.spinner-border {
+    vertical-align: middle;
+}
+</style>
+{% endblock %}

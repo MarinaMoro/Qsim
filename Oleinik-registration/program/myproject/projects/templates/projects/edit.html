@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">Редактировать проект</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Название проекта</label>
+                    <input type="text" name="name" class="form-control" value="{{ project.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea name="description" class="form-control" rows="3">{{ project.description }}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">JSON конфигурация</label>
+                    <textarea name="json_data" class="form-control" rows="5">{{ project.config|pprint }}</textarea>
+                    <small class="text-muted">Введите JSON данные для конфигурации проекта</small>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{% url 'projects:detail' project.id %}" class="btn btn-outline-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

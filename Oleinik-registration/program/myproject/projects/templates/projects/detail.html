@@ -1,0 +1,145 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Кнопка назад -->
+    <div class="mb-3">
+        <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад к проектам
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ project.name }}</h4>
+                    <div>
+                        <a href="{% url 'projects:edit' project.id %}" class="btn btn-sm btn-light me-2">
+                            <i class="bi bi-pencil"></i> Редактировать
+                        </a>
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-download"></i> Экспорт
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'projects:export_json' project.id %}">
+                                        <i class="bi bi-filetype-json"></i> JSON
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Основная информация -->
+                    <div class="mb-4">
+                        <h5>Описание</h5>
+                        <p class="bg-light p-3 rounded">{{ project.description|default:"Нет описания" }}</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Дата создания</h5>
+                            <p class="bg-light p-2 rounded">{{ project.created_at|date:"d.m.Y H:i:s" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Последнее изменение</h5>
+                            <p class="bg-light p-2 rounded">{{ project.updated_at|date:"d.m.Y H:i:s" }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Конфигурация проекта (JSON) -->
+                    {% if project.config %}
+                    <div class="mb-4">
+                        <h5>Конфигурация проекта</h5>
+                        <pre class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;"><code>{{ project.config|pprint }}</code></pre>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Результаты проекта (JSON) -->
+                    {% if project.results %}
+                    <div class="mb-4">
+                        <h5>Результаты</h5>
+                        <pre class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;"><code>{{ project.results|pprint }}</code></pre>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Блок с файлами -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-files"></i> Файлы проекта</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Форма загрузки -->
+                    <form method="post" enctype="multipart/form-data" action="{% url 'projects:upload' project.id %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label class="form-label">Загрузить новый файл</label>
+                            <input type="file" name="file" class="form-control" required>
+                            <small class="text-muted">PNG, PDF, JSON</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-upload"></i> Загрузить
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <!-- Список файлов -->
+                    <h6>Загруженные файлы:</h6>
+                    {% if project.files %}
+                        <div class="list-group" style="max-height: 400px; overflow-y: auto;">
+                            {% for file in project.files %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi 
+                                        {% if file.type == 'image/png' %}bi-file-image text-success
+                                        {% elif file.type == 'application/pdf' %}bi-file-pdf text-danger
+                                        {% elif file.type == 'application/json' %}bi-file-code text-info
+                                        {% else %}bi-file-text{% endif %} me-2">
+                                    </i>
+                                    <a href="{{ file.path }}" target="_blank">{{ file.filename }}</a>
+                                </div>
+                                <div>
+                                    <small class="text-muted me-2">{{ file.size|filesizeformat }}</small>
+                                    <a href="{% url 'projects:download' project.id file.filename %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">Нет загруженных файлов</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Кнопка удаления -->
+            <div class="d-grid">
+                <a href="{% url 'projects:delete' project.id %}" class="btn btn-outline-danger" 
+                   onclick="return confirm('Удалить проект? Все файлы будут удалены.')">
+                    <i class="bi bi-trash"></i> Удалить проект
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+pre {
+    font-size: 0.9rem;
+    border-radius: 5px;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
